@@ -11,7 +11,7 @@ export class UrlsService {
         @InjectModel(Url.name) private readonly urlModel: Model<Url>
     ){}
 
-    shortenUrl(url: string, userId: string){
+    async shortenUrl(url: string, userId: string){
 
         const shortCode = nanoid(6)
 
@@ -20,9 +20,9 @@ export class UrlsService {
             shortCode,
             userId
         })
-        newUrl.save()
+        await newUrl.save()
         const urlFormat = `${process.env.BASE_URL}/urls/${newUrl.shortCode}`
-        return urlFormat
+        return {shortUrl:urlFormat}
     }
 
     async findByCode(shortCode: string){

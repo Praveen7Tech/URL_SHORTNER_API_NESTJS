@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { RegisterDTO } from '../dto/register-dto';
 import { Model } from 'mongoose';
 import { User } from 'src/users/schemas/user.schema';
@@ -15,14 +15,14 @@ export class AuthService {
     ){}
 
     async register(dto: RegisterDTO){
-        const {email, password} = dto;
+        const {name,email, password} = dto;
 
         const existingUser = await this.userModel.findOne({email})
         if(existingUser){
             throw new ConflictException("User with this Email already exist!")
         }
 
-        const user = new this.userModel({email, password})
+        const user = new this.userModel({name,email, password})
         await user.save()
 
         return { message : "User Registration completed."}
@@ -38,7 +38,7 @@ export class AuthService {
 
         const isPasswordMatch = await bcrypt.compare(password, user.password)
         if(!isPasswordMatch){
-            throw new UnauthorizedException("Invalid Credentials")
+            throw new BadRequestException("Invalid Credentials")
         }
 
         const payload = {sub: user._id, email: user.email}
@@ -46,6 +46,18 @@ export class AuthService {
         return { 
             access_token:token,
             user: { email: user.email, id: user._id }
+        }
+    }
+
+    async healthCheck(userId: string){
+        const user = await this.userModel.findById(userId)
+        if(!user){
+            throw new NotFoundException("uSER NOT FOUND")
+        }
+        return {
+            userId: user._id.toString(),
+            name: user.name,
+            email:user.email
         }
     }
 }

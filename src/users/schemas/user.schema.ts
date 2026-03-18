@@ -5,6 +5,9 @@ import * as bcrypt from 'bcrypt';
 
 @Schema()
 export class User extends Document{
+    @Prop({required: true})
+    name: string;
+
     @Prop({unique: true, required: true})
     email: string;
 
