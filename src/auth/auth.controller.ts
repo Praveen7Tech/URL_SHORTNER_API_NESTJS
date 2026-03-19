@@ -16,7 +16,6 @@ export class AuthController {
     @Post('register')
     @HttpCode(HttpStatus.CREATED)
     async register(@Body() registerDto: RegisterDTO){
-        console.log("reg ", registerDto)
         return this.authService.register(registerDto)
     }
 
@@ -24,7 +23,6 @@ export class AuthController {
     @HttpCode(HttpStatus.OK)
     async login(@Body() loginDto: RegisterDTO, @Res({passthrough: true}) response: Express.Response){
         const result = await this.authService.login(loginDto)
-
         response.cookie('access_token', result.access_token, {
             httpOnly: true,       
             secure: true,       
