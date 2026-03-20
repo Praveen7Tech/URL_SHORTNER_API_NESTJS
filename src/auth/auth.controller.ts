@@ -40,8 +40,8 @@ export class AuthController {
         const result = await this.authService.login(loginDto)
         response.cookie('access_token', result.access_token, {
             httpOnly: true,       
-            secure: isProduction,       
-            sameSite: isProduction ? 'none' : 'lax',      
+            secure: false,       
+            sameSite:'lax',      
             maxAge: 24 * 60 * 60 * 1000, 
         });
 
@@ -62,8 +62,8 @@ export class AuthController {
     async logout(@Res({ passthrough: true }) response: Express.Response) {
         response.cookie('access_token', '', {
             httpOnly: true,
-            secure: isProduction,
-            sameSite: isProduction ? 'none' : 'lax',
+            secure: false,
+            sameSite:'lax',
             expires: new Date(0), 
         });
 
