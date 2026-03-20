@@ -38,11 +38,12 @@ export class AuthController {
     @HttpCode(HttpStatus.OK)
     async login(@Body() loginDto: LoginDTO, @Res({passthrough: true}) response : Express.Response){
         const result = await this.authService.login(loginDto)
-        response.cookie('access_token', result.access_token, {
-            httpOnly: true,       
-            secure: false,       
-            sameSite:'lax',      
-            maxAge: 24 * 60 * 60 * 1000, 
+        const token = result.access_token
+        response.cookie('token', token, {
+            httpOnly: true,
+            secure: isProduction,          
+            sameSite: isProduction ? 'none' : 'lax', 
+            maxAge: 24 * 60 * 60 * 1000,
         });
 
         return {
