@@ -1,9 +1,8 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Redirect, Req, Res, UseGuards } from '@nestjs/common';
 import { UrlsService } from './urls.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ShortenUrlDTO } from './dtos/shorten-url.dto';
-import * as Express from 'express';
-import { AuthRequest } from 'src/auth/interfaces/auth.interface'; 
+import { GetUser } from 'src/common/decorators/user.decorators';
 
 @Controller('urls')
 export class UrlsController {
@@ -15,15 +14,14 @@ export class UrlsController {
     @UseGuards(JwtAuthGuard)
     @Post('shorten')
     @HttpCode(HttpStatus.CREATED)
-    async shorten(@Body() shortenUrlDto: ShortenUrlDTO, @Req() req: Express.Request){
-        const authReq = req as AuthRequest;
-        const userId = authReq.user.userId;
+    async shorten(@Body() shortenUrlDto: ShortenUrlDTO, @GetUser('userId') userId: string){
         return await this.urlService.shortenUrl(shortenUrlDto.url, userId)
     }
 
     @Get(':shortCode')
-    async redirectToOriginal(@Param('shortCode') shortCode: string, @Res() res: Express.Response){
+    @Redirect('https://nestjs.com', 302)
+    async redirectToOriginal(@Param('shortCode') shortCode: string){
         const originalUrl = await this.urlService.findByCode(shortCode)
-        res.redirect(originalUrl)
+        return {url: originalUrl}
     }
 }
