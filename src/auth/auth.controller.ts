@@ -6,14 +6,17 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { GetUser } from 'src/common/decorators/user.decorators';
 import { LoginDTO } from 'src/auth/dto/login.dto';
 import { ResendOtpDTO } from './dto/resend-otp.dto';
-const isProduction = process.env.NODE_ENV === 'production';
+import { ConfigService } from '@nestjs/config';
+//const isProduction = process.env.NODE_ENV === 'production';
+//const port = process.env.PORT
 
 
 @Controller('auth')
 export class AuthController {
 
     constructor(
-        private readonly authService: AuthService
+        private readonly authService: AuthService,
+        private readonly configService: ConfigService
     ){}
 
     @Post('register')
@@ -39,6 +42,7 @@ export class AuthController {
     async login(@Body() loginDto: LoginDTO, @Res({passthrough: true}) response : Express.Response){
         const result = await this.authService.login(loginDto)
         const token = result.access_token
+        const isProduction = this.configService.get('NODE_ENV') === 'production';
         console.log("is production : ", isProduction)
         response.cookie('access_token', token, {
             httpOnly: true,
@@ -62,6 +66,7 @@ export class AuthController {
     @Post('logout')
     @HttpCode(HttpStatus.OK)
     async logout(@Res({ passthrough: true }) response: Express.Response) {
+        const isProduction = this.configService.get('NODE_ENV') === 'production';
         response.cookie('access_token', '', {
             httpOnly: true,
             secure: isProduction,
