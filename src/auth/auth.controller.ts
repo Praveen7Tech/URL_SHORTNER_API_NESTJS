@@ -39,7 +39,8 @@ export class AuthController {
     async login(@Body() loginDto: LoginDTO, @Res({passthrough: true}) response : Express.Response){
         const result = await this.authService.login(loginDto)
         const token = result.access_token
-        response.cookie('token', token, {
+        console.log("is production : ", isProduction)
+        response.cookie('access_token', token, {
             httpOnly: true,
             secure: isProduction,          
             sameSite: isProduction ? 'none' : 'lax', 
@@ -63,8 +64,8 @@ export class AuthController {
     async logout(@Res({ passthrough: true }) response: Express.Response) {
         response.cookie('access_token', '', {
             httpOnly: true,
-            secure: false,
-            sameSite:'lax',
+            secure: isProduction,
+            sameSite:isProduction ? "none" : 'lax',
             expires: new Date(0), 
         });
 
