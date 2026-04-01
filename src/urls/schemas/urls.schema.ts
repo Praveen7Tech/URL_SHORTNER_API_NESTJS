@@ -14,7 +14,9 @@ export class Url extends Document{
     userId: Types.ObjectId
 
     @Prop({default: 0})
-    cliks: number
+    clicks: number
+
+    createdAt: Date;
 }
 
 export const UrlSchema = SchemaFactory.createForClass(Url)

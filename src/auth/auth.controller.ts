@@ -41,9 +41,10 @@ export class AuthController {
     @HttpCode(HttpStatus.OK)
     async login(@Body() loginDto: LoginDTO, @Res({passthrough: true}) response : Express.Response){
         const result = await this.authService.login(loginDto)
+        
         const token = result.access_token
         const isProduction = this.configService.get('NODE_ENV') === 'production';
-        console.log("is production : ", isProduction)
+       
         response.cookie('access_token', token, {
             httpOnly: true,
             secure: isProduction,          
